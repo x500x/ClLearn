@@ -36,4 +36,4 @@ jobs:
       - name: usingoutput
         run: |
           echo ${{steps.one-line.outputs}}
-          echo echo ${{steps.multi-line.outputs}
+          echo ${{steps.multi-line.outputs}
