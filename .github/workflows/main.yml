@@ -34,8 +34,10 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+          echo "random_number=$(($RANDOM % 2))" >> $GITHUB_OUTPUT
 
       - name: usingoutput
         run: |
           echo ${{steps.one-line.outputs}}
           echo ${{steps.multi-line.outputs}}
+          echo ${{steps.multi-line.outputs.random_number}}
