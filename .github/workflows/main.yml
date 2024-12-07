@@ -25,7 +25,13 @@ jobs:
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
-    
+    - name: ignore autocrlf
+       run : |
+             git config --global core.autocrlf false
+             git config --global http.postBuffer 53687091200
+             git config --global http.lowSpeedTime 999999
+             git config --global http.lowSpeedLimit 0
+       
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v4
       with:
@@ -35,11 +41,11 @@ jobs:
         publish_branch: 2022
         
     - name: Sync to Gitee
-      uses: wearerequired/git-mirror-action@v1
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
-      with:
-        # 来源仓库
-        source-repo: "git@github.com:x500x/ClLearn.git"
-        # 目标仓库
-        destination-repo: "https://gitee.com/ppyll/msbuid.git"
+          uses: wearerequired/git-mirror-action@master
+          env:
+            SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
+          with:
+            # 来源仓库
+            source-repo: "git@github.com:x500x/ClLearn.git"
+            # 目标仓库
+            destination-repo: "https://gitee.com/ppyll/msbuid.git"
