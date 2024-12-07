@@ -1,44 +1,45 @@
-# This is a basic workflow to help you get started with Actions
+name: SynctoGitee
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  #BUILD_CONFIGURATION: Release
+
+permissions:
+  contents: write
+
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    - uses: actions/checkout@v4
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
     
-      # Runs a single command using the runners shell
-      - name: one-line
-        id: one-line
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: multi-line
-        id: multi-line
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
-          echo "random_number=$(($RANDOM % 2))" >> $GITHUB_OUTPUT
-
-      - name: usingoutput
-        run: |
-          echo ${{steps.one-line.outputs.*}}
-          echo ${{steps.multi-line.outputs.Array.*}}
-          echo ${{steps.multi-line.outputs.random_number}}
-          echo ${GITHUB_OUTPUT}
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise
+        keep_files: true
+        publish_branch: 2022
+        
+    - name: Sync to Gitee
+          uses: wearerequired/git-mirror-action@master
+          env:
+            SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
+          with:
+            # 来源仓库
+            source-repo: "git@github.com:x500x/ClLearn.git"
+            # 目标仓库
+            destination-repo: "https://gitee.com/ppyll/msbuid.git"
