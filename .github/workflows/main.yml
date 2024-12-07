@@ -26,7 +26,7 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
     - name: ignore autocrlf
-       run : |
+       run :|
              git config --global core.autocrlf false
              git config --global http.postBuffer 53687091200
              git config --global http.lowSpeedTime 999999
