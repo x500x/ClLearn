@@ -41,11 +41,11 @@ jobs:
         publish_branch: 2022
         
     - name: Sync to Gitee
-          uses: wearerequired/git-mirror-action@master
-          env:
-            SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
-          with:
-            # 来源仓库
-            source-repo: "git@github.com:x500x/ClLearn.git"
-            # 目标仓库
-            destination-repo: "https://gitee.com/ppyll/msbuid.git"
+      uses: wearerequired/git-mirror-action@master
+      env:
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
+      with:
+          # 来源仓库
+          source-repo: "git@github.com:x500x/ClLearn.git"
+          # 目标仓库
+          destination-repo: "https://gitee.com/ppyll/msbuid.git"
