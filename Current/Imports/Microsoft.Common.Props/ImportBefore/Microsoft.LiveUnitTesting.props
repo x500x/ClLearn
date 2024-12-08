@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- To speed up build performance disable some properties. -->
+  <PropertyGroup Condition="'$(BuildingForLiveUnitTesting)' == 'true'">
+    <!-- Don't deploy VSIX projects. -->
+    <DeployExtension>false</DeployExtension>
+
+    <!-- Don't package VSIX container because the user could try to include pdb files in the VSIX but LUT won't build those by default. Also, turn off VSIX packaging and deployment to speed up LUT build in solutions that contain VSIX projects. -->
+    <CreateVsixContainer>false</CreateVsixContainer>
+
+    <!-- Disable FxCop. -->
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+
+    <!-- Disable FxCop. -->
+    <RunAnalyzers>false</RunAnalyzers>
+
+    <!-- Do not generate XML documentation. -->
+    <DocumentationFile></DocumentationFile>
+
+    <!-- Do not embed sources -->
+    <EmbedAllSources>false</EmbedAllSources>
+
+    <!-- Don't run nuget pack. -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- Disable SourceLink -->
+    <EnableSourceLink>false</EnableSourceLink>
+
+    <!-- Disable features that need to query source control -->
+    <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
+
+    <IsInLiveUnitTestingFilter Condition="'$(LiveUnitTestingProjectFilter)' == '' or $(LiveUnitTestingProjectFilter.ToLowerInvariant().Contains($(MSBuildProjectFullPath.ToLowerInvariant())))">true</IsInLiveUnitTestingFilter>
+  </PropertyGroup>
+
+  <!-- Ensure to exclude all bin/obj folders from both the repo and the build roots. -->
+  <PropertyGroup Condition="'$(BuildingForLiveUnitTesting)' == 'true'">
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(LiveUnitTestingExcludes)</DefaultItemExcludes>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <!-- Specify where the runtime can be found. -->
+    <LiveUnitTestingRuntimePath>$(MSBuildExtensionsPath)\Microsoft\LiveUnitTesting\Microsoft.CodeAnalysis.LiveUnitTesting.Runtime.dll</LiveUnitTestingRuntimePath>
+    <LiveUnitTestingPortableRuntimePath>$(MSBuildExtensionsPath)\Microsoft\LiveUnitTesting\Portable\Microsoft.CodeAnalysis.LiveUnitTesting.Runtime.dll</LiveUnitTestingPortableRuntimePath>
+  </PropertyGroup>
+</Project>

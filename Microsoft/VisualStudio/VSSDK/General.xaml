@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright, Microsoft Corporation, All rights reserved. -->
+<Rule Name="ConfigurationGeneralBrowseObject"
+      DisplayName="General"
+      PageTemplate="generic"
+      Description="General"
+      OverrideMode="Extend"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+    <Rule.Categories>
+        <Category Name="Advanced" 
+                  DisplayName="Advanced" />
+        <Category Name="Ngen" 
+                  DisplayName="Ngen" />
+        <Category Name="VSIX" 
+                  DisplayName="VSIX" />
+    </Rule.Categories>
+
+    <!-- Properties not shown in the UI  -->
+
+    <BoolProperty Name="CreateVsixContainer"
+                  Category="VSIX"
+                  DisplayName="Create Vsix Container"
+                  Description="Specifies if a VSIX file should be generated on build."
+                  Visible="False" />
+
+    <BoolProperty Name="DeployExtension" 
+                  Category="VSIX" 
+                  DisplayName="Specifies if the VSIX file should be deployed to an experimental instance for debugging." 
+                  Visible="False" />
+    
+    <BoolProperty Name="CopyVsixExtensionFiles" 
+                  Category="VSIX" 
+                  DisplayName="Specifies if VSIX content should be copied to an additional output location." 
+                  Visible="False" />
+    
+    <StringProperty Name="CopyVsixExtensionLocation" 
+                    Category="VSIX" 
+                    DisplayName="Copy VSIX content to the following location" 
+                    Visible="False" />
+
+    <!-- Properties page -->
+
+    <BoolProperty Name="GeneratePkgDefFile" 
+                  Category="VSIX" 
+                  DisplayName="Generate .pkgdef file"
+                  Description="Specifies if the .pkgdef file will be generated for the output assembly." />
+    
+    <BoolProperty Name="IncludeAssemblyInVSIXContainer" 
+                  Category="VSIX" 
+                  DisplayName="Include Assembly in VSIX Container" 
+                  Description="Specifies if the project output assembly will be included in the VSIX container." />
+    
+    <BoolProperty Name="IncludeDebugSymbolsInLocalVSIXDeployment" 
+                  Category="VSIX" 
+                  DisplayName="Include Debug Symbols in Local Deployment" 
+                  Description="Specifies if the project output debug symbols will be included in the local deployment." />
+    
+    <BoolProperty Name="IncludeDebugSymbolsInVSIXContainer" 
+                  Category="VSIX" 
+                  DisplayName="Include Debug Symbols in VSIX Container" 
+                  Description="Specifies if the project output debug symbols will be included in the VSIX container."  />
+
+    <BoolProperty Name="UseCodebase" 
+                  Category="VSIX" 
+                  DisplayName="Specifies codebase will be used when generating the pkgdef file."
+                  Visible="False" />
+
+    <EnumProperty Name="InstallRoot" 
+                  Category="VSIX" 
+                  DisplayName="Install Root" 
+                  Description="Specifies which root directory to install the file. By default, the file will be installed to the extension directory.">
+        <EnumValue Name="Default" 
+                   DisplayName="Default" />
+        <EnumValue Name="MSBuild" 
+                   DisplayName="MSBuild" />
+        <EnumValue Name="Schemas" 
+                   DisplayName="Schemas" />
+        <EnumValue Name="PublicAssemblies"
+                   DisplayName="PublicAssemblies" />
+        <EnumValue Name="Licenses" 
+                   DisplayName="Licenses" />
+        <EnumValue Name="ReferenceAssemblies" 
+                   DisplayName="ReferenceAssemblies" />
+        <EnumValue Name="RemoteDebugger" 
+                   DisplayName="RemoteDebugger" />
+    </EnumProperty>
+    
+    <StringProperty Name="VSIXSubPath" 
+                    Category="VSIX" 
+                    DisplayName="VSIX Sub Path" 
+                    Description="Specifies the subpath under the InstallRoot where the file will be installed." />
+
+
+    <BoolProperty Name="CopyBuildOutputToOutputDirectory" 
+                  Category="Advanced" 
+                  DisplayName="Copy Build Output to Output Directory" 
+                  Description="Specifies if the project output assembly will be copied to the output directory." />
+    
+    <BoolProperty Name="CopyOutputSymbolsToOutputDirectory" 
+                  Category="Advanced" 
+                  DisplayName="Copy Debug Symbols to Output Directory" 
+                  Description="Specifies if the project output debug symbols will be copied to the output directory." />
+
+
+    <BoolProperty Name="Ngen" 
+                  Category="Ngen" 
+                  DisplayName="Ngen" 
+                  Description="Specifies if the assembly should be installed via ngen when the extension is installed.  NOTE: This setting will not affect dependencies referenced by this assembly.  Ngen is a tool that improves the performance of managed applications by installing pre-compiled processor-specific machine code in the native image cache on the local computer." />
+    
+    <StringProperty Name="NgenApplication" 
+                    Category="Ngen" 
+                    DisplayName="Ngen Application" 
+                    Description="Specifies the application to pass into ngen via the /ExeConfig switch." />
+    
+    <EnumProperty Name="NgenArchitecture" 
+                  Category="Ngen" 
+                  DisplayName="Ngen Architecture" 
+                  Description="Specifies the target architecture for the native image.">
+        <EnumValue Name="NotSpecified" 
+                   DisplayName="NotSpecified" />
+        <EnumValue Name="X86" 
+                   DisplayName="X86" />
+        <EnumValue Name="X64" 
+                   DisplayName="X64" />
+        <EnumValue Name="Arm64" 
+                   DisplayName="Arm64" />
+        <EnumValue Name="All" 
+                   DisplayName="All" />
+    </EnumProperty>
+
+    <EnumProperty Name="NgenPriority"
+                  Category="Ngen" 
+                  DisplayName="Ngen Priority" 
+                  Description="Specifies the ngen priority level.">
+        <EnumValue Name="1"
+                   DisplayName="1" />
+        <EnumValue Name="2"
+                   DisplayName="2" />
+        <EnumValue Name="3"
+                   DisplayName="3" />
+    </EnumProperty>
+</Rule>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright, Microsoft Corporation, All rights reserved. -->
+<Rule Name="ProjectReference" Description="Project Reference Properties" DisplayName="Project Reference" PageTemplate="generic" OverrideMode="Extend" xmlns="http://schemas.microsoft.com/build/2009/properties">
+    <Rule.Categories>
+        <Category Name="Ngen" DisplayName="Ngen"/>
+        <Category Name="VSIX" DisplayName="VSIX"/>
+    </Rule.Categories>
+
+    <BoolProperty Name="Ngen" Category="Ngen" DisplayName="Ngen" Description="Specifies if the assembly should be installed via ngen when the extension is installed.  NOTE: This setting will not affect dependencies referenced by this assembly.  Ngen is a tool that improves the performance of managed applications by installing pre-compiled processor-specific machine code in the native image cache on the local computer."/>
+    
+    <StringProperty Name="NgenApplication" Category="Ngen" DisplayName="Ngen Application" Description="Specifies the application to pass into ngen via the /ExeConfig switch."/>
+
+    <EnumProperty Name="NgenArchitecture" Category="Ngen" DisplayName="Ngen Architecture" Description="Specifies the target architecture for the native image.">
+        <EnumValue Name="NotSpecified" DisplayName="NotSpecified"/>
+        <EnumValue Name="X86" DisplayName="X86"/>
+        <EnumValue Name="X64" DisplayName="X64"/>
+        <EnumValue Name="Arm64" DisplayName="Arm64"/>
+        <EnumValue Name="All" DisplayName="All"/>
+    </EnumProperty>
+
+    <EnumProperty Name="NgenPriority" Category="Ngen" DisplayName="Ngen Priority" Description="Specifies the ngen priority level.">
+        <EnumValue Name="1" DisplayName="1"/>
+        <EnumValue Name="2" DisplayName="2"/>
+        <EnumValue Name="3" DisplayName="3"/>
+    </EnumProperty>
+
+
+    <EnumProperty Name="InstallRoot" Category="VSIX" DisplayName="Install Root" Description="Specifies which root directory to install the file. By default, the file will be installed to the extension directory.">
+        <EnumValue Name="Default" DisplayName="Default"/>
+        <EnumValue Name="MSBuild" DisplayName="MSBuild"/>
+        <EnumValue Name="Schemas" DisplayName="Schemas"/>
+        <EnumValue Name="PublicAssemblies" DisplayName="PublicAssemblies"/>
+        <EnumValue Name="Licenses" DisplayName="Licenses"/>
+        <EnumValue Name="ReferenceAssemblies" DisplayName="ReferenceAssemblies"/>
+        <EnumValue Name="RemoteDebugger" DisplayName="RemoteDebugger"/>
+    </EnumProperty>
+
+    <StringProperty Name="TemplateType" Category="VSIX" DisplayName="Template Type" Description="Specifies the type of template for references to projects that output templates. Valid values: Project or Item."/>
+
+    <StringProperty Name="VSIXSubPath" Category="VSIX" DisplayName="VSIX Sub Path" Description="Specifies the subpath under the InstallRoot where the file will be installed."/>
+    
+    <StringProperty Name="IncludeOutputGroupsInVSIX" Category="VSIX" DisplayName="Output Groups Included in VSIX" Description="Semicolon delimited list of the output groups of the project reference that will be included in the VSIX container. Valid values include: BuiltProjectOutputGroup, PkgdefProjectOutputGroup."/>
+    
+    <StringProperty Name="IncludeOutputGroupsInVSIXLocalOnly" Category="VSIX" DisplayName="Output Groups Included in VSIX (Local Only)" Description="Semicolon delimited list of the output groups of the project reference that will be included in the local VSIX container when deployed to the experimental instance. Valid values include: DebugSymbolsProjectOutputGroup."/>
+</Rule>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Rule xmlns="http://schemas.microsoft.com/build/2009/properties"
+      Name="Application"
+      OverrideMode="Extend">
+
+	<!--  Hide all irrelevant properties  -->
+	<EnumProperty Name="OutputType"
+                  Category="General"
+                  Visible="False" />
+
+	<DynamicEnumProperty Name="InterceptedTargetFramework"
+                         Category="General"
+                         Visible="False" />
+
+	<StringProperty Name="TargetFrameworks"
+                    Category="General"
+                    Visible="False" />
+
+	<StringProperty Name="InstallOtherFrameworks"
+                    Category="General"
+                    Visible="False" />
+
+	<DynamicEnumProperty Name="TargetPlatformIdentifier"
+                         Category="General"
+                         Visible="False" />
+
+	<DynamicEnumProperty Name="TargetPlatformVersion"
+                         Category="General"
+                         Visible="False" />
+
+	<DynamicEnumProperty Name="SupportedOSPlatformVersion"
+                         Category="General"
+                         Visible="False" />
+
+	<BoolProperty Name="UseWindowsForms"
+                  Category="General"
+                  Visible="False" />
+
+	<BoolProperty Name="UseWPF"
+                  Category="General"
+                  Visible="False" />
+
+	<BoolProperty Name="AutoGenerateBindingRedirects"
+                  Category="General"
+                  Visible="False" />
+
+	<DynamicEnumProperty Name="StartupObject"
+                         Category="General"
+                         Visible="False" />
+
+	<StringProperty Name="AssemblyName"
+                    Category="General"
+                    Visible="False" />
+
+	<StringProperty Name="RootNamespace"
+                    Category="General"
+                    Visible="False" />
+
+	<EnumProperty Name="ResourceSpecificationKind"
+                  Category="Resources"
+                  Visible="False" />
+
+	<StringProperty Name="ApplicationIcon"
+                    Category="Resources"
+                    Visible="False" />
+
+	<EnumProperty Name="ApplicationManifestKind"
+                  Category="Resources"
+                  Visible="False" />
+
+	<StringProperty Name="ApplicationManifestPath"
+                    Category="Resources"
+                    Visible="False" />
+
+	<StringProperty Name="Win32Resource"
+                    Category="Resources"
+                    Visible="False" />
+
+	<BoolProperty Name="IsPublishable"
+                  Category="Resources"
+                  Visible="False" />
+
+	<BoolProperty Name="NuGetAudit"
+				  Category="Dependencies"
+				  Visible="False" />
+
+	<EnumProperty Name="NuGetAuditMode"
+				  Category="Dependencies"
+				  Visible="False" />
+
+	<EnumProperty Name="NuGetAuditLevel"
+				  Category="Dependencies"
+				  Visible="False" />
+</Rule>

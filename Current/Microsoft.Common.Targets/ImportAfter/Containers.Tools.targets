@@ -1,0 +1,10 @@
+<Project>
+    <ItemGroup>
+        <ProjectCapability Condition="'$(EnableSdkContainerDebugging)' == 'true'" Include="SdkContainerDebugging" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(EnableSdkContainerDebugging)' == 'true' AND '$(BuildingInsideVisualStudio)' == 'true' AND '$(DockerIncludeDefaultImageLabels)' != 'false'">
+        <ContainerLabel Include="com.microsoft.created-by" Value="visual-studio"/>
+        <ContainerLabel Include="com.microsoft.visual-studio.project-name" Value="$(MSBuildProjectName)"/>
+    </ItemGroup>
+    <Target Name="CallPublishContainerSdkContainerProfile" AfterTargets="Build" Condition="'$(EnableSdkContainerDebugging)' == 'true' AND '$(SdkContainerPublishOnBuild)' == 'true'" DependsOnTargets="Publish;PublishContainer"/>
+</Project>

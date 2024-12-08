@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
+  <!-- Override Cross Targeting Rebuild target https://github.com/dotnet/msbuild/blob/c6e6cd447ac3944b351247d995f32b4d2010d409/src/Tasks/Microsoft.Common.CrossTargeting.targets#L163 -->
+	<!-- See: https://github.com/dotnet/msbuild/issues/8699 -->
+  <Target Name="Rebuild" DependsOnTargets="_ComputeTargetFrameworkItems">
+      <MSBuild Projects="@(_InnerBuildProjects)"
+          Condition="'@(_InnerBuildProjects)' != ''"
+          Targets="Rebuild"
+          BuildInParallel="$(BuildInParallel)" />
+  </Target>
+  
+</Project>

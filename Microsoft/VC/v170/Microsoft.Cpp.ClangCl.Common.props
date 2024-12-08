@@ -1,0 +1,48 @@
+﻿<!--
+***********************************************************************************************
+Microsoft.Cpp.ClangCl.Common.props
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- disabling automatic C++23 STL modules build as clang-cl does not supports C++ modules yet -->
+    <EnableStdModules>false</EnableStdModules>
+
+    <TargetPlatformIdentifier>Clang.Windows</TargetPlatformIdentifier>
+    <ToolsetISenseIdentifier>$(TargetPlatformIdentifier)</ToolsetISenseIdentifier>
+    <CLToolExe>clang-cl.exe</CLToolExe>
+    <LinkToolExe>lld-link.exe</LinkToolExe>
+    <LibToolExe>llvm-lib.exe</LibToolExe>
+    <_DefaultLLVMInstallDir Condition="'$(_DefaultLLVMInstallDir)' == '' AND '$(PreferredToolArchitecture)' == 'arm64'">$(VsInstallRoot)\VC\Tools\Llvm\ARM64</_DefaultLLVMInstallDir>
+    <_DefaultLLVMInstallDir Condition="'$(_DefaultLLVMInstallDir)' == '' AND '$(PreferredToolArchitecture)' == 'x64'">$(VsInstallRoot)\VC\Tools\Llvm\x64</_DefaultLLVMInstallDir>
+    <_DefaultLLVMInstallDir Condition="'$(_DefaultLLVMInstallDir)' == '' AND '$(PreferredToolArchitecture)' != 'x64'">$(VsInstallRoot)\VC\Tools\Llvm</_DefaultLLVMInstallDir>
+    <LLVMInstallDir Condition="'$(LLVMInstallDir)' == ''">$(_DefaultLLVMInstallDir)</LLVMInstallDir>
+    <ExecutablePath>$(LLVMInstallDir)\bin;$(ExecutablePath)</ExecutablePath>
+    <DebuggerFlavor Condition="'$(DebuggerFlavor)'==''">WindowsLocalDebugger</DebuggerFlavor>
+    <LLVMIncludeVersion>$(LLVMToolsVersion)</LLVMIncludeVersion>
+    <LLVMIncludeVersion Condition="'$(LLVMToolsVersion)' &gt;= '16'">$([System.Text.RegularExpressions.Regex]::Match($(LLVMToolsVersion), `[1-9]\d*`))</LLVMIncludeVersion>
+
+    <!-- Add Clang include path for IntelliSense -->
+    <IncludePath>$(LLVMInstallDir)\lib\clang\$(LLVMIncludeVersion)\include;$(IncludePath)</IncludePath>
+    <ExcludePath Condition="'$(ExcludePath)' == ''">$(LLVMInstallDir)\lib\clang\$(LLVMIncludeVersion)\include;$(CommonExcludePath)</ExcludePath>
+
+	  <!-- ClangCl is not compatible with MSVC analysis, use clang-tidy as default -->
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
+    <EnableClangTidyCodeAnalysis Condition="'$(ApplicationType)' == 'Linux'">false</EnableClangTidyCodeAnalysis>
+    <ClCompilerPath>$(ClangAnalysisToolsPath)\clang-cl.exe</ClCompilerPath>
+
+    <!-- Define Use* properties from LLVM Toolset Extension for backwards compatibility with downstream components that rely on those properties being set. -->
+    <!-- For example vcpkg relies on UseLldLink=true for handling of lld-link.exe (https://github.com/microsoft/vcpkg/issues/4359) -->
+    <UseClangCl>true</UseClangCl>
+    <UseLldLink>true</UseLldLink>
+    <UseLlvmLib>true</UseLlvmLib>
+  </PropertyGroup>
+</Project>

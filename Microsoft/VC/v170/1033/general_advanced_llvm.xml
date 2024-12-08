@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--Copyright, Microsoft Corporation, All rights reserved.-->
+<Rule
+      Name="ConfigurationGeneralAdvanced"
+      OverrideMode="Extend"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+  <DynamicEnumProperty Name="LLVMToolsVersion"
+                     DisplayName="LLVM Toolset Version"
+                     EnumProvider="Directory"
+                     Description="Specifies the full version of the LLVM toolset that this project will use for builds."
+                     Category="General"
+                     F1Keyword="VC.Project.VCConfiguration.LLVMToolsVersion">
+    <DynamicEnumProperty.ProviderSettings>
+      <NameValuePair Name="Path" Value="$(LLVMInstallDir)\lib\clang"/>
+    </DynamicEnumProperty.ProviderSettings>
+  </DynamicEnumProperty>
+</Rule>

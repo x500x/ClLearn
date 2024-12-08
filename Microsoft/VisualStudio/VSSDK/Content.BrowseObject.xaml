@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright, Microsoft Corporation, All rights reserved. -->
+<Rule Name="Content"
+      DisplayName="File Properties"
+      PageTemplate="generic"
+      Description="Content"
+      OverrideMode="Extend"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+    <Rule.Categories>
+        <Category Name="VSIX"
+                  DisplayName="VSIX" />
+    </Rule.Categories>
+
+    <BoolProperty Name="IncludeInVSIX"
+                  Category="VSIX"
+                  DisplayName="Include in VSIX"
+                  Description="Specifies the source file will be included in the VSIX container." 
+                  Default="true" />
+
+    <EnumProperty Name="InstallRoot" 
+                  Category="VSIX" 
+                  DisplayName="Install Root" 
+                  Visible="True" 
+                  Description="Specifies which root directory to install the file. By default, the file will be installed to the extension directory.">
+        <EnumValue Name="Default" DisplayName="Default" />
+        <EnumValue Name="MSBuild" DisplayName="MSBuild" />
+        <EnumValue Name="Schemas" DisplayName="Schemas" />
+        <EnumValue Name="PublicAssemblies" DisplayName="PublicAssemblies" />
+        <EnumValue Name="Licenses" DisplayName="Licenses" />
+        <EnumValue Name="ReferenceAssemblies" DisplayName="ReferenceAssemblies" />
+        <EnumValue Name="RemoteDebugger" DisplayName="RemoteDebugger" />
+    </EnumProperty>
+
+    <StringProperty Name="TargetPath"
+                    Category="VSIX"
+                    DisplayName="Target Path"
+                    Description="The name of the file to be installed on the user's machine."
+                    Default="" />
+
+    <StringProperty Name="VSIXSubPath"
+                    Category="VSIX"
+                    DisplayName="VSIX Sub Path"
+                    Description="Specifies the subpath under the InstallRoot where the file will be installed."
+                    Default="" />
+</Rule>

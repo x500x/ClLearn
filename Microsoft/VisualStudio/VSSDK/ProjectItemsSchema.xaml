@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright, Microsoft Corporation, All rights reserved. -->
+<ProjectSchemaDefinitions xmlns="http://schemas.microsoft.com/build/2009/properties">
+    <ContentType Name="VSCTCompile"
+                 DisplayName="VSCT file"
+                 ItemType="VSCTCompile">
+    </ContentType>
+    <ContentType Name="VSTemplate"
+                 DisplayName="VSTemplate file"
+                 ItemType="VSTemplate">
+    </ContentType>
+
+    <ItemType Name="VSCTCompile" 
+              DisplayName="VSCTCompile" />
+    <ItemType Name="VSTemplate" 
+              DisplayName="VSTemplate" />
+
+    <FileExtension Name=".vsct" 
+                   ContentType="VSCTCompile" />
+    <FileExtension Name=".vstemplate" 
+                   ContentType="VSTemplate" />
+</ProjectSchemaDefinitions>

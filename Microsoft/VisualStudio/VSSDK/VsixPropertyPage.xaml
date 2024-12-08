@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license. See the LICENSE.md file in the project root for more information. -->
+<Rule Name="VSIX"
+      Description="Specifies the project's application settings and properties (VSIX)."
+      DisplayName="VSIX"
+      PageTemplate="generic"
+      Order="1400"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <Rule.DataSource>
+        <DataSource Persistence="ProjectFileWithInterception"
+                    SourceOfDefaultValue="AfterContext"
+                    HasConfigurationCondition="False" />
+    </Rule.DataSource>
+
+    <BoolProperty Name="CreateVsixContainer"
+                  DisplayName="VSIX Container"
+                  Description="Create VSIX Container during build."
+                  Category="General">
+    </BoolProperty>
+
+    <StringProperty Name="CopyVsixExtensionLocation"
+                    DisplayName="Copy VSIX content"
+                    Description="Destination directory to copy VSIX content during build."
+                    Category="General"
+                    Subtype="directory"/>
+</Rule>

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <LinkDelaySign />
+    <LinkGuardEHContMetadata />
+    <LinkGuardSignedReturns />
+    <LinkKeyFile />
+    <WindowsMetadataLinkKeyFile />
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AddModuleNamesToAssembly />
+      <AppContainer />
+      <AssemblyDebug />
+      <AssemblyLinkResource />
+      <CETCompat />
+      <CgThreads />
+      <CLRImageType />
+      <CLRSupportLastError />
+      <CLRThreadAttribute />
+      <CLRUnmanagedCodeCheck />
+      <CreateHotPatchableImage />
+      <DetectOneDefinitionRule />
+      <EmbedManagedResourceFile />
+      <FullProgramDatabaseFile />
+      <GenerateMapFile />
+      <GenerateWindowsMetadata />
+      <IgnoreEmbeddedIDL />
+      <KeyContainer />
+      <LinkErrorReporting />
+      <LinkStatus />
+      <LinkTimeCodeGeneration />
+      <MapExports />
+      <MergedIDLBaseFileName />
+      <MidlCommandFile />
+      <MSDOSStubFileName />
+      <PdbThreads />
+      <Profile />
+      <SetChecksum />
+      <ShowProgress />
+      <SignHash />
+      <StripPrivateSymbols />
+      <SupportNobindOfDelayLoadedDLL />
+      <SupportUnloadOfDelayLoadedDLL />
+      <SuppressStartupBanner />
+      <SwapRunFromCD />
+      <SwapRunFromNET />
+      <TurnOffAssemblyGeneration />
+      <TypeLibraryFile />
+      <TypeLibraryResourceID />
+      <WindowsMetadataFile />
+      <WindowsMetadataKeyContainer />
+      <WindowsMetadataLinkDelaySign />
+      <WindowsMetadataSignHash />
+    </Link>
+  </ItemDefinitionGroup>
+</Project>

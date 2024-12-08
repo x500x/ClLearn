@@ -1,0 +1,12 @@
+# File format:
+#
+# One line per submodule, each with the following format:
+#
+#  LABEL: ORGANIZATION/REPOSITORY/BRANCH@COMMIT
+#
+# Lines starting with # are comments
+#
+Mono: d9a6e87
+Java.Interop: xamarin/java.interop/d17-5@149d70fe
+SQLite: xamarin/sqlite/3.40.1@68c69d8
+Xamarin.Android Tools: xamarin/xamarin-android-tools/d17-5@ca1552d

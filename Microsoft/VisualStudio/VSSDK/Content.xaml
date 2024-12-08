@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright, Microsoft Corporation, All rights reserved. -->
+<Rule Name="Content"
+      DisplayName="File Properties"
+      PageTemplate="generic"
+      Description="Content"
+      OverrideMode="Extend"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+    
+    <BoolProperty Name="IncludeInVSIX" 
+                  Default="False" />
+
+    <EnumProperty Name="InstallRoot" 
+                  Default="Default">
+        <EnumValue Name="Default" />
+        <EnumValue Name="MSBuild" />
+        <EnumValue Name="Schemas" />
+        <EnumValue Name="PublicAssemblies" />
+        <EnumValue Name="Licenses" />
+        <EnumValue Name="ReferenceAssemblies" />
+        <EnumValue Name="RemoteDebugger" />
+    </EnumProperty>
+
+    <StringProperty Name="TargetPath"
+                    Default="" />
+
+    <StringProperty Name="VSIXSubPath"
+                    Default="" />
+</Rule>

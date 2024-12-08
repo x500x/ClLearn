@@ -1,0 +1,90 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+    Rule files that don't need localization go in the neutral directory to save duplicating files into each language
+  -->
+  <PropertyGroup Condition="'$(VSSDKXamlNeutralResourcesDirectory)' == ''">
+    <VSSDKXamlNeutralResourcesDirectory>$(MSBuildThisFileDirectory)</VSSDKXamlNeutralResourcesDirectory>
+  </PropertyGroup>
+
+  <!--
+    Locate the approriate localized xaml resources based on the language ID or name.
+
+    The logic here matches the resource manager sufficiently to handle the fixed set of 
+    possible VS languages and directories on disk.
+
+    We cannot respect the exact probe order of the resource manager as this has to evaluate statically
+    and we have only LangName and LangID and no access to System.Globalization API.
+  -->
+  <PropertyGroup Condition="'$(VSSDKXamlResourcesDirectory)' == ''">
+    <!-- 1. Probe for exact match against LangName. (e.g. pt-BR) -->
+    <VSSDKXamlResourcesDirectory>$(MSBuildThisFileDirectory)$(LangName)</VSSDKXamlResourcesDirectory>
+
+    <!-- 2. Handle special cases of languages which would not match above or below. -->
+    <VSSDKXamlResourcesDirectory Condition="!Exists('$(VSSDKXamlResourcesDirectory)') and '$(LangID)' == '2052'">$(MSBuildThisFileDirectory)zh-Hans</VSSDKXamlResourcesDirectory>
+    <VSSDKXamlResourcesDirectory Condition="!Exists('$(VSSDKXamlResourcesDirectory)') and '$(LangID)' == '1028'">$(MSBuildThisFileDirectory)zh-Hant</VSSDKXamlResourcesDirectory>
+
+    <!-- 3. Probe for parent by taking portion the portion before the hyphen (e.g. fr-FR -> fr) -->
+    <VSSDKXamlResourcesDirectory Condition="!Exists('$(VSSDKXamlResourcesDirectory)')">$(MSBuildThisFileDirectory)$(LangName.Split('-')[0])</VSSDKXamlResourcesDirectory>
+
+    <!-- 4. Fall back to neutral resources if all of the above fail -->
+    <VSSDKXamlResourcesDirectory Condition="!Exists('$(VSSDKXamlResourcesDirectory)')">$(VSSDKXamlNeutralResourcesDirectory)</VSSDKXamlResourcesDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VSSDKXamlNeutralResourcesDirectory Condition="!HasTrailingSlash('$(VSSDKXamlNeutralResourcesDirectory)')">$(VSSDKXamlNeutralResourcesDirectory)\</VSSDKXamlNeutralResourcesDirectory>
+    <VSSDKXamlResourcesDirectory Condition="!HasTrailingSlash('$(VSSDKXamlResourcesDirectory)')">$(VSSDKXamlResourcesDirectory)\</VSSDKXamlResourcesDirectory>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PropertyPageSchema Include="$(VSSDKXamlResourcesDirectory)VsixPropertyPage.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(VSSDKXamlResourcesDirectory)General.xaml">
+      <Context>BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(VSSDKXamlNeutralResourcesDirectory)ProjectItemsSchema.xaml"/>
+
+    <PropertyPageSchema Include="$(VSSDKXamlNeutralResourcesDirectory)Content.xaml">
+      <Context>File</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(VSSDKXamlResourcesDirectory)Content.BrowseObject.xaml">
+      <Context>BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(VSSDKXamlResourcesDirectory)AssemblyReference.xaml">
+      <Context>Project;BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(VSSDKXamlResourcesDirectory)ResolvedAssemblyReference.xaml">
+      <Context>ProjectSubscriptionService;BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(VSSDKXamlResourcesDirectory)ProjectReference.xaml">
+      <Context>Project;BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(VSSDKXamlResourcesDirectory)ResolvedProjectReference.xaml">
+      <Context>ProjectSubscriptionService;BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(VSSDKXamlNeutralResourcesDirectory)VSCTCompile.xaml">
+      <Context>File</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(VSSDKXamlResourcesDirectory)VSCTCompile.BrowseObject.xaml">
+      <Context>BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(VSSDKXamlNeutralResourcesDirectory)VSTemplate.xaml">
+      <Context>File</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(VSSDKXamlResourcesDirectory)VSTemplate.BrowseObject.xaml">
+      <Context>BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(VSSDKXamlNeutralResourcesDirectory)VsixDebugger.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+  </ItemGroup>
+</Project>

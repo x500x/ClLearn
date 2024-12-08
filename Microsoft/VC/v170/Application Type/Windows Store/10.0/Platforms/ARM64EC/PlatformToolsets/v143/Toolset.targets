@@ -1,0 +1,60 @@
+﻿<!--
+***********************************************************************************************
+Toolset.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+This file defines the steps/targets required to build Visual C++ projects
+specifically on ARM64EC platforms.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildThisFileDirectory)ImportBefore\*.targets" Condition="Exists('$(MSBuildThisFileDirectory)ImportBefore')" />
+
+  <!-- only remote debuggers can be used for arm binaries -->
+  <PropertyGroup>
+    <UseDefaultDebuggersPropertyPageSchemas>false</UseDefaultDebuggersPropertyPageSchemas>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- If VS is running on ARM64 machine, add Local debugger -->
+    <AppHostDebuggerPages Condition="'$(_IncludeWindowsLocalDebugger)' == 'true'" Include="$(VCTargetsPath)$(LangID)\AppHostDebugger_Local.xml" />
+    <AppHostDebuggerPages Include="$(VCTargetsPath)$(LangID)\AppHostDebugger_Remote.xml" />
+    <AppHostDebuggerPages Include="$(MSBuildExtensionsPath)\Microsoft\Universal\$(LangID)\WindowsDeviceDebugger.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- If VS is running on ARM64 machine, add Local debugger -->
+    <DesktopDebuggerPages  Condition="'$(_IncludeWindowsLocalDebugger)' == 'true'" Include="$(VCTargetsPath)$(LangID)\debugger_local_windows.xml" />
+    <DesktopDebuggerPages Include="$(VCTargetsPath)$(LangID)\debugger_remote_windows.xml" />
+  </ItemGroup>
+
+  <Target Name="CheckSupportedConfigurationType">
+    <!--We do not support building UWP AppContainer applications for ARM64EC -->
+    <VCMessage Code="MSB8075" Type="Error" Condition="'$(DesignTimeBuild)'!='true' and '$(WindowsAppContainer)'=='true' and '$(ConfigurationType)'=='Application'"/>
+  </Target>
+
+  <PropertyGroup>
+  	<PrepareForBuildDependsOn Condition="'$(DesignTimeBuild)' != 'true'">
+      $(PrepareForBuildDependsOn);
+      CheckSupportedConfigurationType;
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)BuildAsX.ARM64EC.targets"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.CppCommon.targets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.WindowsSDK.targets" />
+
+  <ItemGroup>
+    <PropertyPageSchema Include="$(VCTargetsPath)$(LangID)\general_uwp_arm64x.xml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+  </ItemGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)ImportAfter\*.targets" Condition="Exists('$(MSBuildThisFileDirectory)ImportAfter')" />
+</Project>

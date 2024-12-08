@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <EnableFuzzer />
+    <SpectreMitigation />
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalBMIDirectories />
+      <AdditionalHeaderUnitDependencies />
+      <AdditionalModuleDependencies />
+      <AdditionalUsingDirectories />
+      <AnalyzeExternalRuleset />
+      <BasicRuntimeChecks />
+      <BrowseInformation />
+      <CompileAsManaged />
+      <CompileAsWinRT />
+      <ConformanceMode />
+      <CreateHotpatchableImage />
+      <DisableAnalyzeExternal />
+      <DisableLanguageExtensions />
+      <DisableSpecificWarnings />
+      <EnableModules />
+      <EnableParallelCodeGeneration />
+      <EnablePREfast />
+      <EnforceTypeConversionRules />
+      <ErrorReporting />
+      <ExpandAttributedSource />
+      <ExternalDirectoriesEnv />
+      <ExternalTemplatesDiagnostics />
+      <ExternalWarningLevel />
+      <ForceConformanceInForLoopScope />
+      <ForcedUsingFiles />
+      <ForceSynchronousPDBWrites />
+      <GenerateModuleDependencies />
+      <GenerateSourceDependencies />
+      <GenerateXMLDocumentationFiles />
+      <GuardSignedReturns />
+      <IgnoreStandardIncludePath />
+      <MinimalRebuild />
+      <ModuleOutputFile />
+      <OpenMPSupport />
+      <PREfastAdditionalOptions />
+      <PREfastAdditionalPlugins />
+      <PREfastLog />
+      <PREfastProjectDirectory />
+      <PREfastRulesetDirectories />
+      <PREfastRulesetFile />
+      <ProgramDataBaseFileName />
+      <RemoveUnreferencedCodeData />
+      <SDLCheck />
+      <TranslateIncludes />
+      <TreatAngleIncludeAsExternal />
+      <TreatSpecificWarningsAsErrors />
+      <TreatWChar_tAsBuiltInType />
+      <UseFullPaths />
+      <UseStandardPreprocessor />
+      <UseUnicodeForAssemblerListing />
+      <WholeProgramOptimization />
+      <WinRTNoStdLib />
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

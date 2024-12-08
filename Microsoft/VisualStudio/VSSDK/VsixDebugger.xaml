@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright, Microsoft Corporation, All rights reserved. -->
+<Rule  Name="VsixDebugger"
+       DisplayName="Vsix Debugger"
+       PageTemplate="debugger"
+       Description="Vsix Debugger options"
+       xmlns:sys="clr-namespace:System;assembly=mscorlib"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+    <Rule.DataSource>
+        <DataSource Persistence="UserFile" 
+                    HasConfigurationCondition="False" 
+                    SourceOfDefaultValue="AfterContext"/>
+    </Rule.DataSource>
+
+    <Rule.Metadata>
+        <sys:Guid x:Key="DebugTargetTypeCommandGuid">568ABDF7-D522-474D-9EED-34B5E5095BA5</sys:Guid>
+        <sys:UInt32 x:Key="DebugTargetTypeCommandId">0x100</sys:UInt32>
+        <sys:String x:Key="DebugTargetDropdownEnum">DeployTargetInstanceId</sys:String>
+    </Rule.Metadata>
+
+    <DynamicEnumProperty Name="DeployTargetInstanceId"
+                         DisplayName="VSIX Debug Target"
+                         EnumProvider="VsixDebugTargetProvider"
+                         Description="Specifies the Visual Studio instance to debug." />
+
+    <StringProperty Name="VSSDKTargetPlatformRegRootSuffix" 
+                    ReadOnly="False" 
+                    Default="exp" />
+
+    <StringProperty Name="AdditionalArguments" 
+                    ReadOnly="False" />
+
+    <StringProperty Name="TargetVsixContainer"
+                    Category="VSIX"
+                    DisplayName="Target VSIX Container"
+                    Description="Specifies the full path to the generated VSIX."
+                    Visible="False">
+        <StringProperty.DataSource>
+            <DataSource Persistence="ProjectFile"
+                        HasConfigurationCondition="False" 
+                        SourceOfDefaultValue="AfterContext" />
+        </StringProperty.DataSource>
+    </StringProperty>
+
+    <BoolProperty Name="CreateVsixContainer"
+                  Category="VSIX"
+                  DisplayName="Create VSIX Container"
+                  Description="Specifies if the build should generate a VSIX file."
+                  Visible="False">
+        <BoolProperty.DataSource>
+            <DataSource Persistence="ProjectFile"
+                        HasConfigurationCondition="False" 
+                        SourceOfDefaultValue="AfterContext" />
+        </BoolProperty.DataSource>
+    </BoolProperty>
+</Rule>

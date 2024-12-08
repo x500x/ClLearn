@@ -1,0 +1,376 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Safeguard against importing this .targets file multiple times -->
+  <PropertyGroup>
+    <FakesImported>true</FakesImported>
+  </PropertyGroup>
+
+  <!-- Build customization properties -->  
+  <PropertyGroup>
+    <FakesBinPath Condition="$(FakesBinPath) == ''">$(MSBuildProjectDirectory)</FakesBinPath>
+    <FakesIntermediatePath>$([System.IO.Path]::Combine('$(ProjectDir)','$(IntermediateOutputPath)Fakes'))</FakesIntermediatePath>
+    <FakesContinueOnError Condition="$(FakesContinueOnError) == ''">false</FakesContinueOnError>
+    <FakesToolsPath Condition="$(FakesToolsPath) == ''">$(FakesBinPath)</FakesToolsPath>
+    <FakesMSBuildPath Condition="'$(FakesMSBuildPath)' == ''">$(MSBuildToolsPath)\msbuild.exe</FakesMSBuildPath>
+    
+    <!-- Pass unit test project's PlatformTarget to GenerateFakes task *only if* PlatformTarget is present! -->
+    <FakesVerbosity Condition="'$(FakesVerbosity)' == ''">Critical</FakesVerbosity>
+    <FakesTasks>$(FakesBinPath)\Microsoft.QualityTools.Testing.Fakes.Tasks.dll</FakesTasks>
+
+    <!-- The following properties are exposed to the user as configurable -->
+    <FakesRelativeOutputDir>$(FakesRelativeOutputDir)FakesAssemblies</FakesRelativeOutputDir>
+    <FakesConfigurationDirectory Condition="$(FakesConfigurationDirectory) == ''">$(ProjectDir)Fakes</FakesConfigurationDirectory>
+    <!-- If a user chooses to route all Fakes generation and runtime execution through Fakes V2 through an environment variable, honor that. 
+    A project's properties would take precedence over a global environment variable though. -->
+    <FakesUseV2Generation Condition="'$(FakesUseV2Generation)' == '' AND '$(Fakes_Use_V2)' == 'true'">true</FakesUseV2Generation>
+    <!--The default logic to choose Fakes V2 over V1.-->
+    <FakesUseV2Generation Condition="'$(FakesUseV2Generation)' == ''">$(UsingMicrosoftNETSdk)</FakesUseV2Generation>
+    <!--  FakesOutputPath is not allowed to be overridden in V2 generation. Instead, FakesRelativeOutputDir can be overridden.
+          AdditionalDesignTimeBuildInput only works with relative paths, and so this change was needed. 
+          Tracking:  https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1150797 -->
+	  <FakesOutputPath Condition="$(FakesUseV2Generation) == 'true' OR $(FakesOutputPath) == ''">$(ProjectDir)$(FakesRelativeOutputDir)</FakesOutputPath>
+  </PropertyGroup>
+
+  <!--
+    This item is used to indicate to the designtime build that the generated
+    fakes assembly reference needs to be picked up to populate intellisense.
+
+    This property is not ideal to be used in the long run since the general
+    recommendation is to use items generated in design time build within the
+    design time build. But, fakes generation can take too long to run, and we
+    choose to not run during design time build.
+  -->
+  <ItemGroup>
+    <!--
+      ContentSensitive => contents of file matters. If this is false, only
+      addition and removal of files would trigger designtime build.
+      We set this to false as Roslyn monitors the referenced dlls for changes, and so we
+      do not need to trigger redundant design time builds.
+    -->
+    <AdditionalDesignTimeBuildInput
+      Condition="$(FakesUseV2Generation) == 'true'"
+      Include="$(FakesRelativeOutputDir)\*.dll"
+      ContentSensitive="false" />
+  </ItemGroup>
+  
+  <!-- Make "Fakes" item available as a "Build Action" in the Properties window -->
+  <ItemGroup>
+    <AvailableItemName Include="Fakes" />
+  </ItemGroup>
+
+  <UsingTask TaskName="Microsoft.QualityTools.Testing.Fakes.GenerateFakes" AssemblyFile="$(FakesTasks)" />
+  <UsingTask TaskName="Microsoft.QualityTools.Testing.Fakes.ReportFakesWarnings" AssemblyFile="$(FakesTasks)" />
+
+  <!-- This is the legacy generation of fakes that occurs before RAR in msbuild, and uses its own custom RAR -->
+  <!-- Generate .Fakes assemblies before assembly references of the parent project are resolved -->
+  <PropertyGroup>
+    <ResolveAssemblyReferencesDependsOn>
+      $(ResolveAssemblyReferencesDependsOn);
+      FakesGenerateBeforeBuild;
+    </ResolveAssemblyReferencesDependsOn>
+  </PropertyGroup>
+
+  <!-- Define Fakes build steps -->
+  <PropertyGroup>
+    <FakesGenerateBeforeBuildDependsOn>
+      $(FakesGenerateBeforeBuildDependsOn);
+      ResolveFakesReferences;
+      BuildFakesAssemblies;
+    </FakesGenerateBeforeBuildDependsOn>
+  </PropertyGroup>
+
+  <Target
+    Name="FakesGenerateBeforeBuild"
+    Condition="@(Fakes) != '' AND $(BuildingProject) AND $(FakesUseV2Generation) != 'true'"
+    DependsOnTargets="$(FakesGenerateBeforeBuildDependsOn)"/>
+
+  <!-- Collect the references excluding Fakes assembly files. -->
+  <Target
+    Name="ResolveFakesReferences"
+    Condition="@(Fakes) != '' AND $(BuildingProject) AND $(FakesUseV2Generation) != 'true'">
+    
+    <ItemGroup>
+      <ReferenceWithoutFakes Include="@(Reference)" />
+      <ReferenceWithoutFakes Remove="$(FakesOutputPath)\*.Fakes.dll" />
+    </ItemGroup>
+    
+    <PropertyGroup>
+      <FakesResolveAssemblyReferencesStateFile>$(IntermediateOutputPath)$(MSBuildProjectFile)FakesResolveAssemblyReference.cache</FakesResolveAssemblyReferencesStateFile>
+      <FakesResolveAssemblyReferencesFindDependencies Condition="'$(FakesResolveAssemblyReferencesFindDependencies)' == ''">true</FakesResolveAssemblyReferencesFindDependencies>
+      <FakesResolveAssemblyReferencesFindRelatedFiles Condition="'$(FakesResolveAssemblyReferencesFindRelatedFiles)' == ''">true</FakesResolveAssemblyReferencesFindRelatedFiles>
+    </PropertyGroup>
+    
+    <ResolveAssemblyReference
+        Assemblies="@(ReferenceWithoutFakes)"
+        AssemblyFiles="@(_ResolvedProjectReferencePaths);@(_ExplicitReference)"
+        TargetFrameworkDirectories="$(TargetFrameworkDirectory)"
+        InstalledAssemblyTables="@(InstalledAssemblyTables);@(RedistList)"
+        IgnoreDefaultInstalledAssemblyTables="$(IgnoreDefaultInstalledAssemblyTables)"
+        IgnoreDefaultInstalledAssemblySubsetTables="$(IgnoreInstalledAssemblySubsetTables)"
+        CandidateAssemblyFiles="@(Content);@(None)"
+        SearchPaths="$(AssemblySearchPaths)"
+        AllowedAssemblyExtensions="$(AllowedReferenceAssemblyFileExtensions)"
+        AllowedRelatedFileExtensions="$(AllowedReferenceRelatedFileExtensions)"
+        TargetProcessorArchitecture="$(ProcessorArchitecture)"
+        AppConfigFile="@(_ResolveAssemblyReferencesApplicationConfigFileForExes)"
+        AutoUnify="$(AutoUnifyAssemblyReferences)"
+        IgnoreVersionForFrameworkReferences="$(IgnoreVersionForFrameworkReferences)"
+        FindDependencies="$(FakesResolveAssemblyReferencesFindDependencies)"
+        FindSatellites="false"
+        FindSerializationAssemblies="false"
+        FindRelatedFiles="$(FakesResolveAssemblyReferencesFindRelatedFiles)"
+        Silent="true"
+        TargetFrameworkVersion="$(TargetFrameworkVersion)"
+        TargetFrameworkMoniker="$(TargetFrameworkMoniker)"
+        TargetFrameworkMonikerDisplayName="$(TargetFrameworkMonikerDisplayName)"    
+        TargetedRuntimeVersion="$(TargetedRuntimeVersion)"
+        StateFile="$(FakesResolveAssemblyReferencesStateFile)"
+        InstalledAssemblySubsetTables="@(InstalledAssemblySubsetTables)"
+        TargetFrameworkSubsets="@(_ReferenceInstalledAssemblySubsets)"
+        FullTargetFrameworkSubsetNames="$(FullReferenceAssemblyNames)"
+        FullFrameworkFolders="$(_FullFrameworkReferenceAssemblyPaths)"
+        FullFrameworkAssemblyTables="@(FullFrameworkAssemblyTables)"
+        ProfileName=""
+        LatestTargetFrameworkDirectories="@(LatestTargetFrameworkDirectories)"
+        CopyLocalDependenciesWhenParentReferenceInGac="$(CopyLocalDependenciesWhenParentReferenceInGac)">
+      <Output TaskParameter="ResolvedFiles" ItemName="FakesResolvedReferencePaths"/>
+      <Output TaskParameter="ResolvedDependencyFiles" ItemName="FakesResolvedReferenceDependencyPaths"/>
+      <Output TaskParameter="RelatedFiles" ItemName="FakesRelatedPaths"/>
+      <Output TaskParameter="SatelliteFiles" ItemName="FakesSatellitePaths"/>
+      <Output TaskParameter="SuggestedRedirects" ItemName="FakesSuggestedRedirects"/>
+      <Output TaskParameter="FilesWritten" ItemName="FileWrites"/>
+    </ResolveAssemblyReference>
+  </Target>
+
+  <!-- Generate fakes assembly files, if outdated. -->
+  <Target
+    Name="BuildFakesAssemblies"
+    Condition="@(Fakes) != '' AND $(BuildingProject) AND $(FakesUseV2Generation) != 'true'"
+    Inputs="
+      @(Fakes);
+      @(FakesReferencePaths);
+      @(FakesResolvedReferencePaths);
+      @(FakesResolvedReferenceDependencyPaths);
+      @(FakesRelatedPaths);
+      @(FakesSatellitePaths);
+      @(FakesSuggestedRedirects);
+    "
+    Outputs="@(Fakes->'$(FakesOutputPath)\%(FileName).Fakes.dll')">
+
+    <!-- Get the PlatformTarget after runtime identifier interence tasks are run. -->
+    <PropertyGroup>
+      <!-- Pass unit test project's PlatformTarget to GenerateFakes task *only if* PlatformTarget is present! -->
+      <FakesCompilationProperties Condition="'$(PlatformTarget)' != ''">$(FakesCompilationProperties);PlatformTarget=$(PlatformTarget)</FakesCompilationProperties>
+      <FakesCommandLineArguments Condition="'$(FakesCompilationProperties)' != ''">$(FakesCommandLineArguments) /Properties:"$(FakesCompilationProperties)"</FakesCommandLineArguments>
+      <FakesCommandLineArguments>$(FakesCommandLineArguments) /msbuildpath:"$(FakesMSBuildPath)"</FakesCommandLineArguments>
+    </PropertyGroup>
+    
+    <GenerateFakes
+      ContinueOnError="$(FakesContinueOnError)"
+      Verbosity="$(FakesVerbosity)"
+      ForceX86="$(FakesForceX86)"
+      TargetFrameworkVersion="$(TargetFrameworkVersion)"
+      TargetFrameworkMoniker="$(TargetFrameworkMoniker)"
+      TargetRuntimeVersion="$(TargetedRuntimeVersion)"
+      UseFakesV2="$(FakesUseV2Generation)"
+      ReferenceFiles="
+        @(FakesReferencePaths);
+        @(FakesResolvedReferencePaths);
+        @(FakesResolvedReferenceDependencyPaths);"
+      SearchPaths="@(FakesSearchPaths)"
+      CommandLineArguments="$(FakesCommandLineArguments)"
+      OutputPath="$(FakesOutputPath)"
+      IntermediatePath="$(FakesIntermediatePath)"
+      Fakes="@(Fakes)"
+      ToolsPath="$(FakesToolsPath)">
+      <Output TaskParameter="FakesAssemblies" ItemName="FakesAssemblies" />
+      <Output TaskParameter="FakesConfigurations" ItemName="FakesConfigurations" />
+      <Output TaskParameter="FakesMessages" ItemName="FakesMessageFiles" />
+    </GenerateFakes>
+    
+    <ReportFakesWarnings MessageFiles="@(FakesMessageFiles)" ContinueOnError="$(FakesContinueOnError)"/>
+    
+    <ItemGroup>
+      <FileWrites Include="$(FakesIntermediatePath)\**" />
+      <ReferenceCopyLocalPaths Include="@(FakesConfigurations)" />
+    </ItemGroup>
+  
+    <PropertyGroup>
+      <!-- Append directory where .Fakes assemblies are generated to the end of the assembly search path -->
+      <AssemblySearchPaths>
+        $(AssemblySearchPaths);
+        $(FakesOutputPath)
+      </AssemblySearchPaths>
+    </PropertyGroup>
+
+  </Target>
+
+  <!-- Define New Fakes Generation steps -->
+  <!-- This occurs after the original RAR, retrieving references from it, instead of using its own RAR.
+  This solves the problem of missing references in the SDK style projects, as the custom RAR doesn't find them-->
+  <PropertyGroup>
+    <GenerateFakesDependsOn>
+      $(GenerateFakesDependsOn);
+      BeforeGenerateFakesAssemblies;
+      GenerateFakesAssemblies;
+      CopyFakesAssembliesToOutputDir;
+    </GenerateFakesDependsOn>
+  </PropertyGroup>
+
+  <!--This should not run during design time build, and should only run for SDK-Style projects
+      As this uses a new Roslyn based implementation that could break behaviour in legacy projects-->
+  <Target
+    Name="GenerateFakes"
+    Condition="$(BuildingProject) AND $(FakesUseV2Generation) == 'true'"
+    DependsOnTargets="$(GenerateFakesDependsOn)"
+    AfterTargets="ResolveAssemblyReferences"/>
+
+  <Target
+    Name="BeforeGenerateFakesAssemblies"
+    Condition="$(BuildingProject) AND $(FakesUseV2Generation) == 'true'">
+    
+    <ItemGroup>
+      <!-- Add all present .Fakes files in the contained FakesConfigurationDirectory
+           The list is appended to for compatibility reasons, and is a list of distinct items. 
+           Include and Exclude are used to deduplicate. -->
+      <Fakes Include="$(FakesConfigurationDirectory)\*.Fakes" Exclude="@(Fakes)" />
+    </ItemGroup>
+    
+  </Target>
+  
+  <!-- Generate fakes assembly files, if outdated. -->
+  <Target
+    Name="GenerateFakesAssemblies"
+    Condition="@(Fakes) != '' AND $(BuildingProject) AND $(FakesUseV2Generation) == 'true'"
+    Inputs="
+      @(Fakes);
+      @(FakesReferencePaths);
+      @(_ResolveAssemblyReferenceResolvedFiles);
+      @(ReferenceDependencyPaths);
+      @(_ReferenceRelatedPaths);
+      @(ReferenceSatellitePaths);
+      @(SuggestedBindingRedirects);
+    "
+    Outputs="@(Fakes->'$(FakesOutputPath)\%(FileName).Fakes.dll')">
+
+    <!-- Get the PlatformTarget after runtime identifier interence tasks are run. -->
+    <PropertyGroup>
+      <!-- Pass unit test project's PlatformTarget to GenerateFakes task *only if* PlatformTarget is present! -->
+      <FakesCompilationProperties Condition="'$(PlatformTarget)' != ''">$(FakesCompilationProperties);PlatformTarget=$(PlatformTarget)</FakesCompilationProperties>
+      <FakesCommandLineArguments Condition="'$(FakesCompilationProperties)' != ''">$(FakesCommandLineArguments) /Properties:"$(FakesCompilationProperties)"</FakesCommandLineArguments>
+      <FakesCommandLineArguments>$(FakesCommandLineArguments) /msbuildpath:"$(FakesMSBuildPath)"</FakesCommandLineArguments>
+    </PropertyGroup>
+      
+    <GenerateFakes
+      ContinueOnError="$(FakesContinueOnError)"
+      Verbosity="$(FakesVerbosity)"
+      ForceX86="$(FakesForceX86)"
+      TargetFrameworkVersion="$(TargetFrameworkVersion)"
+      TargetFramework="$(TargetFramework)"
+      TargetFrameworkMoniker="$(TargetFrameworkMoniker)"
+      TargetRuntimeVersion="$(TargetedRuntimeVersion)"
+      UseFakesV2="$(FakesUseV2Generation)"
+      UsesWPF="$(UseWPF)"
+      ReferenceFiles="
+        @(FakesReferencePaths);
+        @(_ResolveAssemblyReferenceResolvedFiles);
+        @(ReferenceDependencyPaths);"
+      SearchPaths="@(FakesSearchPaths)"
+      CommandLineArguments="$(FakesCommandLineArguments)"
+      OutputPath="$(FakesOutputPath)"
+      IntermediatePath="$(FakesIntermediatePath)"
+      Fakes="@(Fakes)"
+      ToolsPath="$(FakesToolsPath)">
+      <Output TaskParameter="FakesAssemblies" ItemName="FakesAssemblies" />
+      <Output TaskParameter="FakesConfigurations" ItemName="FakesConfigurations" />
+      <Output TaskParameter="FakesMessages" ItemName="FakesMessageFiles" />
+    </GenerateFakes>
+    
+    <ReportFakesWarnings MessageFiles="@(FakesMessageFiles)" ContinueOnError="$(FakesContinueOnError)"/>
+
+    <ItemGroup>
+      <FileWrites Include="$(FakesIntermediatePath)\**" />
+      <ReferenceCopyLocalPaths Include="@(FakesConfigurations)" />
+    </ItemGroup>
+  </Target>
+
+  <!--Copy Fakes Assemblies to Output Path next to built project.dll for test runs
+      This is necessary since Fakes V2 generation doesn't add an assembly reference to the csproj-->
+  <Target
+    Name="CopyFakesAssembliesToOutputDir"
+    Condition="$(FakesUseV2Generation) == 'true' AND Exists('$(FakesOutputPath)')">
+    <ItemGroup>
+      <!--If this list is created within the Content Include, then link doesn't work as expected
+          which is why the list needs to be created before being creating Content items-->
+      <FakesAssembliesToCopy Include="$(FakesOutputPath)\*.dll" />
+      <Content
+        Include="@(FakesAssembliesToCopy)"
+        Condition="@(FakesAssembliesToCopy) != ''"
+        Link="%(Filename)%(Extension)"
+        CopyToOutputDirectory="PreserveNewest"
+        IsAssembly="true" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    In the new implementation of Fakes, the task runs after RAR, and so the generated fakes assembly references
+    are not included as <Reference /> items. This target does a separate RAR task, so that the Fakes.dll files
+    get resolved and are similarly processed by RAR like references would.
+    This ensures that the resolved references are passed into CSC task as a compilation reference, or are used by
+    the deps generation to create a deps.json file.
+  -->
+  <Target
+    Name="AppendGeneratedFakesAssemblyReferences"
+    Condition="$(FakesUseV2Generation) == 'true' AND Exists('$(FakesOutputPath)')"
+    BeforeTargets="FindReferenceAssembliesForReferences">
+    <PropertyGroup>
+      <FakesResolveAssemblyReferencesStateFile>$(IntermediateOutputPath)$(MSBuildProjectFile)FakesResolveAssemblyReference.cache</FakesResolveAssemblyReferencesStateFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <FakesAssembliesToResolve Include="$(FakesOutputPath)\*.dll" />
+    </ItemGroup>
+    <!-- Resolve just the .Fakes.dll files that are not present as regular <Reference /> items. -->
+    <ResolveAssemblyReference
+      Assemblies="@(FakesAssembliesToResolve)"
+      AssemblyFiles=""
+      TargetFrameworkDirectories="$(TargetFrameworkDirectory)"
+      InstalledAssemblyTables="@(InstalledAssemblyTables);@(RedistList)"
+      IgnoreDefaultInstalledAssemblyTables="$(IgnoreDefaultInstalledAssemblyTables)"
+      IgnoreDefaultInstalledAssemblySubsetTables="$(IgnoreInstalledAssemblySubsetTables)"
+      CandidateAssemblyFiles="@(Content);@(None)"
+      SearchPaths="$(AssemblySearchPaths)"
+      AllowedAssemblyExtensions="$(AllowedReferenceAssemblyFileExtensions)"
+      AllowedRelatedFileExtensions="$(AllowedReferenceRelatedFileExtensions)"
+      TargetProcessorArchitecture="$(ProcessorArchitecture)"
+      AppConfigFile="@(_ResolveAssemblyReferencesApplicationConfigFileForExes)"
+      AutoUnify="false"
+      IgnoreVersionForFrameworkReferences="$(IgnoreVersionForFrameworkReferences)"
+      FindDependencies="false"
+      FindSatellites="false"
+      FindSerializationAssemblies="false"
+      FindRelatedFiles="false"
+      Silent="false"
+      TargetFrameworkVersion="$(TargetFrameworkVersion)"
+      TargetFrameworkMoniker="$(TargetFrameworkMoniker)"
+      TargetFrameworkMonikerDisplayName="$(TargetFrameworkMonikerDisplayName)"
+      TargetedRuntimeVersion="$(TargetedRuntimeVersion)"
+      StateFile="$(FakesResolveAssemblyReferencesStateFile)"
+      InstalledAssemblySubsetTables="@(InstalledAssemblySubsetTables)"
+      TargetFrameworkSubsets="@(_ReferenceInstalledAssemblySubsets)"
+      FullTargetFrameworkSubsetNames="$(FullReferenceAssemblyNames)"
+      FullFrameworkFolders="$(_FullFrameworkReferenceAssemblyPaths)"
+      FullFrameworkAssemblyTables="@(FullFrameworkAssemblyTables)"
+      ProfileName=""
+      LatestTargetFrameworkDirectories="@(LatestTargetFrameworkDirectories)"
+      CopyLocalDependenciesWhenParentReferenceInGac="$(CopyLocalDependenciesWhenParentReferenceInGac)">
+      <Output TaskParameter="ResolvedFiles" ItemName="ReferencePath"/>
+      <Output TaskParameter="ResolvedDependencyFiles" ItemName="FakesResolvedReferenceDependencyPaths"/>
+      <Output TaskParameter="RelatedFiles" ItemName="FakesRelatedPaths"/>
+      <Output TaskParameter="SatelliteFiles" ItemName="FakesSatellitePaths"/>
+      <Output TaskParameter="SuggestedRedirects" ItemName="FakesSuggestedRedirects"/>
+      <Output TaskParameter="FilesWritten" ItemName="FileWrites"/>
+    </ResolveAssemblyReference>
+  </Target>
+  
+</Project>
