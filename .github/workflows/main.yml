@@ -36,16 +36,8 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild
+        publish_dir: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC
         keep_files: true
-        publish_branch: 2022
+        publish_branch: VC
         
-    - name: Sync to Gitee
-      uses: wearerequired/git-mirror-action@master
-      env:
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
-      with:
-          # 来源仓库
-          source-repo: "git@github.com:x500x/ClLearn.git"
-          # 目标仓库
-          destination-repo: "https://gitee.com/ppyll/msbuid.git"
+    
