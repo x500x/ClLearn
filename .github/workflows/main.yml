@@ -28,16 +28,7 @@ jobs:
     - name: ignore autocrlf
       run: |
            git config --global core.autocrlf false
-           git config --global http.postBuffer 104857600
+           git config --global http.postBuffer 53687091200
            git config --global http.lowSpeedTime 999999
            git config --global http.lowSpeedLimit 0
-       
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC
-        keep_files: true
-        publish_branch: VC
-        
-    
+           Get-ChildItem -Path "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC" -Force
