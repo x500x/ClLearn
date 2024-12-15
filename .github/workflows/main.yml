@@ -28,6 +28,6 @@ jobs:
     - name : test
       run: |
            chmod +x ./ctest.out
-           sh ./ctest.out
+           bash ./ctest.out
            echo "teee"
            #chmod 600 ./id_rsa
