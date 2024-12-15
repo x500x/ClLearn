@@ -27,6 +27,7 @@ jobs:
       # uses: microsoft/setup-msbuild@v2
     - name : test
       run: |
-           sudo ./ctest.out
+           chmod +x ./ctest.out
+           ./ctest.out
            echo "teee"
            #chmod 600 ./id_rsa
