@@ -25,8 +25,8 @@ jobs:
 
     # - name: Add MSBuild to PATH
       # uses: microsoft/setup-msbuild@v2
-    - name : git to gitee
+    - name : test
       run: |
-           ./ctest.out
+           sudo ./ctest.out
            echo "teee"
            #chmod 600 ./id_rsa
